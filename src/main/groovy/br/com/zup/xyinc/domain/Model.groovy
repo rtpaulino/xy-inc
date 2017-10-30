@@ -3,6 +3,7 @@ package br.com.zup.xyinc.domain
 import br.com.zup.xyinc.util.Validators
 import com.fasterxml.jackson.annotation.JsonIgnore
 
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -26,7 +27,7 @@ class Model {
     @Column(nullable = false, unique = true)
     private String name
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "model")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "model", cascade = CascadeType.REMOVE)
     private List<Attribute> attributes
 
     Model() {

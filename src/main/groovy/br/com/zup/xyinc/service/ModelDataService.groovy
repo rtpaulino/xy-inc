@@ -8,7 +8,10 @@ import br.com.zup.xyinc.repository.ModelDataRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+import javax.transaction.Transactional
+
 @Service
+@Transactional
 class ModelDataService {
 
     @Autowired

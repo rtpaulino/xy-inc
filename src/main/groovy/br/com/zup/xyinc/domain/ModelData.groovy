@@ -34,10 +34,11 @@ class ModelData {
 
     ModelData() {}
 
-    ModelData(Long id, Long version, Model model) {
+    ModelData(Long id, Long version, Model model, Map<String, Object> data) {
         this.id = id
         this.version = version
         this.model = model
+        this.data = data
     }
 
     Long getId() {

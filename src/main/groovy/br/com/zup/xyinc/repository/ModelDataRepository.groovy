@@ -7,4 +7,5 @@ import org.springframework.data.repository.CrudRepository
 interface ModelDataRepository extends CrudRepository<ModelData, Long> {
     ModelData findByModelAndId(Model model, Long id)
     List<ModelData> findAllByModel(Model model)
+    long deleteByModel(Model model)
 }

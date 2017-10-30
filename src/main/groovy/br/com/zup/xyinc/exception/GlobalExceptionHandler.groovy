@@ -1,9 +1,5 @@
-package br.com.zup.xyinc.controller
+package br.com.zup.xyinc.exception
 
-import br.com.zup.xyinc.exception.AlreadyExistsException
-import br.com.zup.xyinc.exception.BadRequestException
-import br.com.zup.xyinc.exception.NotFoundException
-import br.com.zup.xyinc.exception.ValidationException
 import groovy.json.JsonBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus

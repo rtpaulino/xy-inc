@@ -1,7 +1,7 @@
 package br.com.zup.xyinc.controller
 
-import br.com.zup.xyinc.domain.Model
 import br.com.zup.xyinc.service.ModelDataService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -19,6 +19,9 @@ class ModelDataController {
     @Autowired
     ModelDataService modelDataService
 
+    @Autowired
+    ObjectMapper mapper
+
     @RequestMapping(method = RequestMethod.GET)
     List<Map> list(@PathVariable modelName) {
         return modelDataService.findAll(modelName)
@@ -30,8 +33,8 @@ class ModelDataController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<Model> create(@PathVariable modelName, @RequestBody Map input) {
-        Model result = modelDataService.create(modelName, input)
+    ResponseEntity<Map> create(@PathVariable modelName, @RequestBody Map input) {
+        Map result = modelDataService.create(modelName, input)
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

@@ -8,6 +8,10 @@ import java.time.ZonedDateTime
 
 class Converters {
     static Date toDate(Object value) {
+        if (value instanceof Date) {
+            return value
+        }
+
         String valueAsString = toString(value)
         if (StringUtils.isEmpty(valueAsString)) {
             return null
@@ -18,6 +22,10 @@ class Converters {
     }
 
     static BigDecimal toDecimal(Object value, int precision, int scale) {
+        if (value instanceof BigDecimal) {
+            return value
+        }
+
         String valueAsString = toString(value)
         if (StringUtils.isEmpty(valueAsString)) {
             return null
