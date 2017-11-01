@@ -7,10 +7,11 @@ import br.com.zup.xyinc.repository.AttributeRepository
 import br.com.zup.xyinc.repository.ModelDataRepository
 import br.com.zup.xyinc.repository.ModelRepository
 import br.com.zup.xyinc.service.ModelService
-import com.fasterxml.jackson.core.JsonGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
@@ -47,7 +48,6 @@ class ModelDataControllerSpec extends Specification {
             Attribute attribute = new Attribute(it)
             attribute.model = model
             attributeRepository.save(attribute)
-            JsonGenerator
         }
     }
 
@@ -204,5 +204,32 @@ class ModelDataControllerSpec extends Specification {
 
         then:
         response.statusCode == HttpStatus.BAD_REQUEST
+    }
+
+    def "Get missing item from model"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.getForEntity("/customer/999", Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+
+    }
+
+    def "Delete missing item from model"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.exchange("/customer/999", HttpMethod.DELETE, null, Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+
+    }
+
+    def "Update missing item from model"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.exchange("/customer/999", HttpMethod.PUT, new HttpEntity<Map>([name: "tryagain" ]), Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+
     }
 }

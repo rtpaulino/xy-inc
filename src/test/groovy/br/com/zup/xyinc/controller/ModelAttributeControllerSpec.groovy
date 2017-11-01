@@ -7,6 +7,10 @@ import br.com.zup.xyinc.repository.ModelRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
 @SpringBootTest(webEnvironment =  SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -197,4 +201,90 @@ class ModelAttributeControllerSpec extends Specification {
         result.precision == null
     }
 
+    def "insert an attribute with same name as existing"() {
+        setup:
+        createAttributes()
+        reloadModel()
+
+        when:
+        ResponseEntity<Map> response = restTemplate.postForEntity("/model/${model.id}/attribute", [
+                name: "name",
+                type: "STRING",
+                length: 300,
+                scale: null,
+                precision: null
+        ], Map)
+
+        then:
+        response.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
+    }
+
+    def "insert an attribute with invalid name"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.postForEntity("/model/${model.id}/attribute", [
+                name: name,
+                type: "INTEGER",
+                length: null,
+                scale: null,
+                precision: null
+        ], Map)
+
+        then:
+        response.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
+
+        where:
+        name         | _
+        null         | _
+        ""           | _
+        "id"         | _
+        "version"    | _
+        "/xyz#^"     | _
+        "com espaco" | _
+    }
+
+    def "insert an attribute with invalid type"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.postForEntity("/model/${model.id}/attribute", [
+                name: "whatever",
+                type: "WHATEVER",
+                length: null,
+                scale: null,
+                precision: null
+        ], Map)
+
+        then:
+        response.statusCode == HttpStatus.BAD_REQUEST
+    }
+
+    def "get missing attribute"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.getForEntity("/model/${model.id}/attribute/999", Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+    }
+
+    def "get attribute from missing model"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.getForEntity("/model/999/attribute/1", Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+    }
+
+    def "delete missing attribute"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.exchange("/model/${model.id}/attribute/999", HttpMethod.DELETE, null, Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+    }
+
+    def "update missing attribute"() {
+        when:
+        ResponseEntity<Map> response = restTemplate.exchange("/model/${model.id}/attribute/999", HttpMethod.PUT, new HttpEntity<Map>([name: "tryagain" ]), Map)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+    }
 }
