@@ -7,34 +7,34 @@ utilizá-los através de interface RESTful.
 
 ## Tecnologias
 
-- Spring Boot
+- **Spring Boot**
 
-- Gradle (dependências, build, etc.)
+- **Gradle** (dependências, build, etc.)
 
-- Groovy
-  Escolhi groovy ao invés de Java puro pois acredito que agiliza o processo de desenvolvimento (é um pouco menos *verbose*),
-  além de trazer alguns recursos não disponíveis no Java que facilitam a codificação.
+- **Groovy**
 
-- Spock (testes)
+  Escolhi *Groovy* ao invés de *Java* puro por ser menos *verbose* e ter recursos que agilizam a codificação
 
-- JaCoCo (cobertura)
+- **Spock** (testes)
+
+- **JaCoCo** (cobertura)
 
 ## Banco de Dados
 
-Para facilitar a utilização, não configurei um banco de dados específico. Por conta disso, o Spring irá subir um H2
+Para facilitar a utilização, não configurei um banco de dados específico. Assim o Spring irá subir um banco *H2*
 em memória (volátil). Se desejar manter os dados persistidos, basta:
 
-1. Configurar DataSource com H2 pesistido;
+1. Configurar DataSource com H2 pesistido; ou
 
-2. Configurar DataSource para um SGDB que suporte acesso via JDBC; (o código deve funcionar igualmente sem problemas)
+2. Configurar DataSource para um *SGDB* que dê suporte acesso via JDBC; (o código deve funcionar igualmente sem problemas)
 
-Não recomendo a utilização do H2 para nenhum sistema. Ele foi utilizado nesse projeto apenas por conveniência.
+Não recomendo a utilização do *H2* para nenhum sistema. Ele foi utilizado nesse projeto apenas por conveniência.
 
 ## Arquitetura
 
 O sistema pode ser dividido em três camadas principais:
 
-- Controllers
+- **Controllers**
 
     A camada dos *Controllers* é responsável por:
     - Definição das URL's e Métodos (GET/POST/PUT/POST) disponíveis;
@@ -42,13 +42,13 @@ O sistema pode ser dividido em três camadas principais:
     - Repassar para a camada dos *Services*
     - Retornar a resposta adequada para o cliente; (Definir Status Code, Http Headers, Body, etc.)
 
-- Services
+- **Services**
 
-    A camada dos *Services* é concentra as regras de negócio e o funcionamento da aplicação.
+    A camada dos *Services* concentra as regras de negócio e o funcionamento da aplicação.
     Esta camada recebe os pedidos da camanda de *Controllers* e utiliza a camada de *Models*
     para acessar os dados persistidos.
 
-- Models
+- **Models**
 
     A camda de *Models* é a camanda onde é definida as entidades de pesistência de banco. Utilizei **JPA**
     para definir as entidades e `CrudRepository` para facilitar a utilização e persistência dos dados,
@@ -76,11 +76,12 @@ criação de consultas personlizadas com índices sobre colunas, etc. No entanto
 no presente projeto por conta da restrição de tempo. Essa solução necessitaria que fosse tratado diversas
 situações:
 - Ao mudar a estrutura, se já houver dados, o que fazer? Perder os dados?
-- Caso um tipo de dados seja alterado em uma coluna, como tratar a perda de dados? Seria possível alguma conversão?
+- Como converter os dados no caso de mudança de formato da coluna?
+- Seria necessário criar diversas chamadas SQL para cada mudança (ALTER TABLE)
 - Não seria possível utilizar as facilidades do Spring e JPA. Tornar-se-ia necessário criar Queries dinâmicas
 para cada um dos modelos criados.
 
-Por esse motivos acima citados, implementei a segunda opção. Mesmo assim, também necessitei decidir
+Por esses motivos acima citados, implementei a segunda opção. Mesmo assim, também necessitei decidir
 entre duas abordagens:
 
 1. Criar uma tabela única para guardar os dados com uma coluna do tipo CLOB contendo os dados
@@ -94,13 +95,15 @@ dois, apesar de mais complicada (teria que consultar diversas linhas de tabela e
 linha apenas), poderia permitir um armazenamento dos dados de acordo com o tipo de dado e ainda permitiria
 futuramente consultas mais complexas com índices.
 
+A opção 1 também tem a vantagem que, na mudança de estrutura, não é necessário alterar os dados. Quando o
+dado for acessado, então posso enviar no formato da definição do momento.
+
 Também considerei a utilização de banco de dados NoSQL (como Cassandra). No entanto, não me pareceu
 adequado para a evolução do produto, visto que bancos NoSQL muitas vezes apresentam restrições intrínsecas
 quando deseja-se fazer buscas mais complexas, bem como agragações de dados.
 
 Por exemplo, no Cassandra, a própria busca por "todas as linhas" é extremamente não recomendada.
 
-Por fim, criei os dados são armazenados no formato de JSON na coluna CLOB. Se, por exemplo, utilizássemos
-um banco como o Postgres, poderíamos nos utilizar da coluna de tipo JSON, o que pode permitir a consulta
-dentro dessa coluna. Possivelmente essa forma já atenderia a futura demandas para o projeto.
-
+Por fim, os dados são armazenados no formato *JSON* na coluna *CLOB*. Se, por exemplo, utilizássemos
+um banco como o *PostgreSQL*, poderíamos nos utilizar da coluna de tipo *JSON* e, dessa forma, permitir
+consultas com filtros nesses dados. Muito provavelmente essa forma já atenderia a futura demandas para o projeto.
